@@ -21,7 +21,6 @@ document.body.onload = function() {
   const config2 = {
     parent: '#usersTable',
     columns: [
-      {title: 'Id', value: 'id'},
       {title: 'Имя', value: 'name'},
       {title: 'Фамилия', value: 'surname'},
       {title: 'Дата рождения', value: 'birthday'},
@@ -53,8 +52,13 @@ class DataTable {
         this.makeBody();
         return;
     }
+    this.getData(config.apiUrl);
     
-    fetch(config.apiUrl)
+    
+  }
+  
+  getData(url) {
+    fetch(url)
     .then((response) => {
         return response.json();
     })
@@ -63,7 +67,6 @@ class DataTable {
         this.makeBody();
         console.log(this.data);
     });
-    
   }
   
   makeData(rawData) {
@@ -83,19 +86,23 @@ class DataTable {
     thead.appendChild(tr);
       
     for (let i = 0; i < this.columns.length; i++) {
-    
-      let th = document.createElement("th");
-      th.innerHTML = this.columns[i].title;
-      th.className = "th";
+      let th = this.makeTh(this.columns[i].title);
       tr.appendChild(th);
-      
       let arrow = document.createElement("div");
       arrow.className = "arrow";
       th.appendChild(arrow);
-      
       th.onclick = () => this.sortColumn(i, arrow);
     }
+    tr.appendChild(this.makeTh("Действия"));
   }
+  
+  makeTh(caption) {
+    let th = document.createElement("th");
+    th.innerHTML = caption;
+    th.className = "th";
+    return th;
+  }
+  
   
   makeBody() {
     
@@ -118,8 +125,20 @@ class DataTable {
       td.innerHTML = item[column.value];
       tr.appendChild(td);
     }
-  
+    let td = document.createElement("td");
+    td.className = "td";
+    tr.appendChild(td);
+    let delBtn = document.createElement("button");
+    delBtn.innerHTML = "Удалить";
+    delBtn.className = "del-btn";
+    td.appendChild(delBtn);
+    delBtn.onclick = () => this.delItem(item["id"]);
   }
+  
+  delItem(id) {
+    console.log(id);
+  }
+  
   
   reloadBody() {
     this.table.removeChild(this.table.lastChild);
