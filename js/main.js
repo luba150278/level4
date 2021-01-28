@@ -25,7 +25,7 @@ document.body.onload = function() {
       {title: 'Фамилия', value: 'surname'},
       {title: 'Дата рождения', value: 'birthday'},
     ],
-    apiUrl: "http://mock-api.shpp.me/asadov/users"
+    apiUrl: "https://mock-api.shpp.me/asadov/users"
   };
   
   let dt = new DataTable(config2);
