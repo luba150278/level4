@@ -18,7 +18,18 @@ document.body.onload = function() {
     {id: 30056, name: 'Даша', surname: 'Васечкина', age: 15},
   ];
 
-  let dt = new DataTable(config1, users);
+  const config2 = {
+    parent: '#usersTable',
+    columns: [
+      {title: 'Id', value: 'id'},
+      {title: 'Имя', value: 'name'},
+      {title: 'Фамилия', value: 'surname'},
+      {title: 'Дата рождения', value: 'birthday'},
+    ],
+    apiUrl: "http://mock-api.shpp.me/asadov/users"
+  };
+  
+  let dt = new DataTable(config2);
 
 };
 
@@ -29,7 +40,6 @@ class DataTable {
   
     this.parent = config.parent;
     this.columns = config.columns;
-    this.data = data;
       
     const tableDiv = document.querySelectorAll(config.parent)[0];
     this.table = document.createElement("table");
@@ -37,7 +47,31 @@ class DataTable {
     tableDiv.appendChild(this.table);
   
     this.makeHead();
-    this.makeBody();
+
+    if(data) {
+        this.data = data;
+        this.makeBody();
+        return;
+    }
+    
+    fetch(config.apiUrl)
+    .then((response) => {
+        return response.json();
+    })
+    .then((data) => {
+        this.data = this.makeData(data.data);
+        this.makeBody();
+        console.log(this.data);
+    });
+    
+  }
+  
+  makeData(rawData) {
+    let res = [];
+    for (let d in rawData) {
+        res.push(rawData[d]);
+    }
+    return res;
   }
   
   makeHead() {
