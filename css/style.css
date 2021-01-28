@@ -5,7 +5,7 @@
 }
 
 .section {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 10px auto;
 }
 
@@ -34,6 +34,10 @@
   position: relative;
 }
 
+.tr:hover {
+  background-color: #AFBFAF;
+}
+
 .arrow {
   border: 6px solid transparent;
   width: 0;
@@ -59,4 +63,16 @@
   padding: 5px 10px;
 }
 
+.del-btn {
+  background-color: #AE402E;
+  width: 100%;
+  padding: 5px 20px;
+  font-family: "Arial", serif;
+  color: #DFEFDF;
+  font-weight: bold;
+  outline: none;
+  border-color: #5A705F;
+  margin: 2px auto;
+  border-radius: 5px;
+}
 
