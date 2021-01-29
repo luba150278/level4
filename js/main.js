@@ -53,56 +53,54 @@ class DTable {
   make() {
     
     const tableDiv = document.querySelectorAll(this.parent)[0];
-    this.table = this.makeElement("table");
-    tableDiv.appendChild(this.table);
+    let top = this.makeElement(tableDiv, "div", "", "dtb-top");
+    let search = this.makeElement(top, "input", "", "dtb-search");
+    search.onkeyup = () => this.filterData(search);
+    
+    this.table = this.makeElement(tableDiv, "table");
     
     this.makeHead();
-    this.makeBody();
+    this.makeBody(this.data);
   }
+
   
-  makeHead() {
-    const thead = this.makeElement("thead");
-    this.table.appendChild(thead);
-    
-    const tr = this.makeElement("tr");
-    thead.appendChild(tr);
-      
-    for (let i = 0; i < this.columns.length; i++) {
-      let th = this.makeElement("th", this.columns[i].title);
-      tr.appendChild(th);
-      this.makeSortable(th, i);
-    }
-    
-    tr.appendChild(this.makeElement("th", "Действия"));
-  }
-  
-  
-  makeElement(name, value = "", className = "", func = null) {
+  makeElement(parent, name, value = "", className = "", func = null) {
     let elm = document.createElement(name);
     elm.className = "dtb-" + name;
     if (value) elm.innerHTML = value;
     if (className) elm.className = className;
-    if (func) elm.onclick = func; 
+    if (func) elm.onclick = func;
+    parent.appendChild(elm);
     return elm;
   }
   
+  
+  makeHead() {
+
+    const thead = this.makeElement(this.table, "thead");
+    const tr = this.makeElement(thead, "tr");
+      
+    for (let i = 0; i < this.columns.length; i++) {
+      let th = this.makeElement(tr, "th", this.columns[i].title);
+      this.makeSortable(th, i);
+    }
     
+    this.makeElement(tr, "th", "Действия");
+  }
+  
+   
   makeSortable(th, columnNum) {
-    let arrow = this.makeElement("div", "", "dtb-arrow");
-    th.appendChild(arrow);
+    let arrow = this.makeElement(th, "div", "", "dtb-arrow");
     th.onclick = () => this.sortColumn(columnNum, arrow);
   }
   
   
-  makeBody() {
+  makeBody(data) {
     
-    const tbody = this.makeElement("tbody");
-    this.table.appendChild(tbody);
+    const tbody = this.makeElement(this.table, "tbody");
   
-    for (let item of this.data) {
-      let tr = this.makeElement("tr");
-      tbody.appendChild(tr);
-      this.makeRow(tr, item);
+    for (let item of data) {
+      this.makeRow(this.makeElement(tbody, "tr"), item);
     }
   }
   
@@ -110,20 +108,15 @@ class DTable {
   makeRow(tr, item) {
     
     for (let column of this.columns) {
-      let td = this.makeElement("td", item[column.value]);
-      tr.appendChild(td);
+      this.makeElement(tr, "td", item[column.value]);
     }
     
-    let td = this.makeElement("td");
-    tr.appendChild(td);
-    let delBtn = this.makeElement("button", "Удалить", "dtb-del-btn", () => this.delItem(item["id"]));
-    td.appendChild(delBtn);
+    this.makeElement(this.makeElement(tr, "td"), "button", "Удалить", "dtb-del-btn", () => this.delItem(item["id"]));
   }
   
   
   delItem(id) {
-    console.log(id);
-    for (let i = 0; i < this.data.length; i++) {
+      for (let i = 0; i < this.data.length; i++) {
       if (this.data[i].id == id) {
         this.data.splice(i, 1);
         break;
@@ -133,9 +126,9 @@ class DTable {
   }
   
   
-  reloadBody() {
+  reloadBody(data = null) {
     this.table.removeChild(this.table.lastChild);
-    this.makeBody();
+    this.makeBody(data ? data : this.data);
   }
   
   
@@ -151,6 +144,23 @@ class DTable {
       this.data.sort((a, b) => a[val] < b[val] ? -1 : 1);
     }
     this.reloadBody();
+  }
+  
+  filterData(searchInput) {
+    let findStr = searchInput.value.toLowerCase();
+
+    if (findStr.length < 1) this.reloadBody();
+
+    let fdata = this.data.filter((item) => {
+      for (let c of this.columns) {
+        if ((item[c.value] + "").toLowerCase().includes(findStr)) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    this.reloadBody(fdata);
   }
   
 }
