@@ -67,16 +67,51 @@
   padding: 5px 10px;
 }
 
-.dtb-del-btn {
+.dtb-del-btn, .dtb-add-btn, .dtb-new-btn {
   background-color: #AE402E;
-  width: 100%;
   padding: 5px 20px;
   font-family: "Arial", serif;
   color: #DFEFDF;
   font-weight: bold;
   outline: none;
   border-color: #5A705F;
-  margin: 2px auto;
+  margin: 2px;
   border-radius: 5px;
 }
 
+.dtb-add-btn {
+  background-color: #40AE2E;
+}
+
+.dtb-new-btn {
+  width: 200px;
+  background-color: #4A604F;
+}
+
+.dtb-top {
+  width: 100%;
+  padding: 2px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dtb-search {
+  font-weight: bold;
+  padding: 5px 10px;
+  margin: 5px;
+  width: 300px;
+  border: 1px solid #4A604F;
+  border-radius: 7px;
+  color: #4A604F;
+}
+
+.dtb-hidden {
+  display: none;
+}
+
+.dtb-new-value {
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 5px;
+  color: #4A604F;
+}

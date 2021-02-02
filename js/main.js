@@ -53,54 +53,118 @@ class DTable {
   make() {
     
     const tableDiv = document.querySelectorAll(this.parent)[0];
-    let top = this.makeElement(tableDiv, "div", "", "dtb-top");
-    let search = this.makeElement(top, "input", "", "dtb-search");
-    search.onkeyup = () => this.filterData(search);
     
-    this.table = this.makeElement(tableDiv, "table");
+    let top = this.makeElement({parent: tableDiv, tag: "div", className: "top"});
+    this.search = this.makeElement({
+      parent: top, 
+      tag: "input", 
+      className: "search", 
+      event: "keyup", 
+      func: () => this.filterData()
+    });
+    this.search.placeholder = "Начните ввод для поиска... ";
+    
+    let newBtn = this.makeElement({
+      parent: top,
+      tag: "button",
+      text: "Добавить",
+      className: "new-btn",
+      event: "click",
+      func: () => this.newRecord()
+    });
+    this.addForm = this.makeElement({parent: tableDiv, tag: "form"});
+    this.addForm.name = "add-form";
+    this.table = this.makeElement({parent: this.addForm, tag: "table"});
     
     this.makeHead();
     this.makeBody(this.data);
   }
 
   
-  makeElement(parent, name, value = "", className = "", func = null) {
-    let elm = document.createElement(name);
-    elm.className = "dtb-" + name;
-    if (value) elm.innerHTML = value;
-    if (className) elm.className = className;
-    if (func) elm.onclick = func;
-    parent.appendChild(elm);
+  makeElement({parent = null, tag, text = "", className = "", event = "", func = null}) {
+    let elm = document.createElement(tag);
+    elm.className = "dtb-" + tag;
+    if (text) elm.innerHTML = text;
+    if (className) elm.className = "dtb-" + className;
+    if (event && func) elm.addEventListener(event, func);
+    if (parent) parent.appendChild(elm);
     return elm;
   }
   
   
   makeHead() {
 
-    const thead = this.makeElement(this.table, "thead");
-    const tr = this.makeElement(thead, "tr");
+    const thead = this.makeElement({parent: this.table, tag: "thead"});
+    const tr = this.makeElement({parent: thead, tag: "tr"});
       
     for (let i = 0; i < this.columns.length; i++) {
-      let th = this.makeElement(tr, "th", this.columns[i].title);
+      let th = this.makeElement({parent: tr, tag: "th", text: this.columns[i].title});
       this.makeSortable(th, i);
     }
     
-    this.makeElement(tr, "th", "Действия");
+    this.makeElement({parent: tr, tag: "th", text: "Действия"});
   }
   
    
   makeSortable(th, columnNum) {
-    let arrow = this.makeElement(th, "div", "", "dtb-arrow");
+    let arrow = this.makeElement({parent: th, tag: "div", className: "arrow"});
     th.onclick = () => this.sortColumn(columnNum, arrow);
   }
   
   
+  makeAddRow(tbody) {
+    
+    //this.addForm = this.makeElement({parent: tbody, tag: "form"});
+    this.addRow = this.makeElement({parent: tbody, tag: "tr", className: "hidden"});
+    
+    for (let column of this.columns) {
+      //this.makeElement({parent: this.addRow, tag: "td"});
+      let elm = this.makeElement({
+        parent: this.makeElement({parent: this.addRow, tag: "td"}), 
+        //parent: this.addForm,  
+        tag: "input",
+        className: "new-value",
+      });
+      elm.name = column.value;
+      elm.required = true;
+    }
+    
+    
+    this.makeElement({
+      parent: this.makeElement({parent: this.addRow, tag: "td"}),
+      //parent: this.addForm,
+      tag: "input", 
+      //text: "Принять", 
+      className: "hidden",
+    }).type="submit";
+    
+    this.addForm.onsubmit = () => this.addRecord(event);
+  }
+  
+  addRecord(event) {
+    event.preventDefault();
+    //console.log(document.forms["add-form"]["surname"].value);
+    const form = document.forms["add-form"];
+    let rec = {};
+    console.log(this.columns);
+    for (let c of this.columns) {
+      rec[c.value] = form[c.value].value;
+      if (typeof(this.data[0][c.value]) == "number"){
+        rec[c.value] = +rec[c.value];
+      }
+    }
+    this.data.push(rec);
+    console.log(this.data);
+    this.reloadBody();
+  }
+  
   makeBody(data) {
     
-    const tbody = this.makeElement(this.table, "tbody");
-  
+    const tbody = this.makeElement({parent:this.table, tag:"tbody"});
+    this.makeAddRow(tbody);
+    
     for (let item of data) {
-      this.makeRow(this.makeElement(tbody, "tr"), item);
+      this.makeRow(this.makeElement({parent:tbody, tag:"tr"}), item);
     }
   }
   
@@ -108,10 +172,21 @@ class DTable {
   makeRow(tr, item) {
     
     for (let column of this.columns) {
-      this.makeElement(tr, "td", item[column.value]);
+      this.makeElement({parent: tr, tag: "td", text: item[column.value]});
     }
     
-    this.makeElement(this.makeElement(tr, "td"), "button", "Удалить", "dtb-del-btn", () => this.delItem(item["id"]));
+    this.makeElement({parent: this.makeElement({parent: tr, tag: "td"}),
+                     tag: "button", 
+                     text: "Удалить", 
+                     className: "del-btn",
+                     event: "click",
+                     func: () => this.delItem(item["id"])
+                    });
+  }
+  
+  
+  newRecord() {
+    this.addRow.classList.toggle("dtb-hidden");
   }
   
   
@@ -147,7 +222,7 @@ class DTable {
   }
   
   filterData(searchInput) {
-    let findStr = searchInput.value.toLowerCase();
+    let findStr = this.search.value.toLowerCase();
 
     if (findStr.length < 1) this.reloadBody();
 
@@ -162,6 +237,8 @@ class DTable {
 
     this.reloadBody(fdata);
   }
+  
+  
   
 }
 
