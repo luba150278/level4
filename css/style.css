@@ -9,36 +9,40 @@
   margin: 10px auto;
 }
 
-.table {
+.dtb-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.thead, .tbody {
+.dtb-thead, .dtb-tbody {
   width: 100%;
 }
 
-.tr-head {
+.dtb-thead {
   background-color: #5A705F;
   color: #DFEFDF;
 }
 
-.tr:nth-child(even) {
+.dtb-tr:nth-child(even) {
   background-color: #DFEFDF;
 }
 
-.th {
+.dtb-tr:hover {
+  background-color: #AFBFAF;
+}
+
+.dtb-th {
   text-align: left;
   padding: 5px 10px;
   font-family: "Arial", serif;
   position: relative;
 }
 
-.tr:hover {
-  background-color: #AFBFAF;
+.dtb-th:hover {
+  background-color: #4A604F;
 }
 
-.arrow {
+.dtb-arrow {
   border: 6px solid transparent;
   width: 0;
   height: 0;
@@ -48,31 +52,66 @@
   bottom: 0;
 }
 
-.arrow-up {
+.dtb-arrow-up {
   border-bottom: 6px solid black;
   border-top: 6px solid transparent; 
   top: 0;
 }
 
-.arrow-down {
+.dtb-arrow-down {
   border-top: 6px solid black;
   bottom: 0;
 }
 
-.td {
+.dtb-td {
   padding: 5px 10px;
 }
 
-.del-btn {
+.dtb-del-btn, .dtb-add-btn, .dtb-new-btn {
   background-color: #AE402E;
-  width: 100%;
   padding: 5px 20px;
   font-family: "Arial", serif;
   color: #DFEFDF;
   font-weight: bold;
   outline: none;
   border-color: #5A705F;
-  margin: 2px auto;
+  margin: 2px;
   border-radius: 5px;
 }
 
+.dtb-add-btn {
+  background-color: #40AE2E;
+}
+
+.dtb-new-btn {
+  width: 200px;
+  background-color: #4A604F;
+}
+
+.dtb-top {
+  width: 100%;
+  padding: 2px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dtb-search {
+  font-weight: bold;
+  padding: 5px 10px;
+  margin: 5px;
+  width: 300px;
+  border: 1px solid #4A604F;
+  border-radius: 7px;
+  color: #4A604F;
+}
+
+.dtb-hidden {
+  display: none;
+}
+
+.dtb-new-value {
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 5px;
+  color: #4A604F;
+}
