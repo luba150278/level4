@@ -19,43 +19,73 @@ document.body.onload = function() {
   ];
 
   const config2 = {
-    parent: '#usersTable',
+    parent: '#remoteTable',
     columns: [
       {title: 'Имя', value: 'name'},
       {title: 'Фамилия', value: 'surname'},
       {title: 'Дата рождения', value: 'birthday'},
+      {title: 'Аватар', value: 'avatar'},
     ],
     apiUrl: "https://mock-api.shpp.me/asadov/users"
   };
   
   DataTable(config1, users);
-  //DataTable(config2);
+  DataTable(config2);
 
 };
 
 
 function DataTable(config, data) {
-  let dt = new DTable(config, data);
+  let dt;
+  if (data) {
+    dt = new LocalDTable(config, data);
+  } else if (config.apiUrl) {
+    dt = new RemoteDTable(config);
+  } else {
+    return;
+  }
   dt.make();
+}
+
+
+function makeElement({parent = null, tag, text = "", className = "", event = "", func = null}) {
+  let elm = document.createElement(tag);
+  elm.className = "dtb-" + tag;
+  if (text) elm.innerHTML = text;
+  if (className) elm.className = "dtb-" + className;
+  if (event && func) elm.addEventListener(event, func);
+  if (parent) parent.appendChild(elm);
+  return elm;
 }
 
 
 class DTable {
   
-  constructor(config, data) {
-  
+  constructor(config) {
     this.parent = config.parent;
     this.columns = config.columns;
-    this.data = data;
+    this.data = null;
   }
   
   
   make() {
-    
     const tableDiv = document.querySelectorAll(this.parent)[0];
     
-    let top = this.makeElement({parent: tableDiv, tag: "div", className: "top"});
-    this.search = this.makeElement({
+    this.makeTopControls(tableDiv)
+
+    this.addForm = makeElement({parent: tableDiv, tag: "form"});
+    this.addForm.name = "add-form";
+    this.table = makeElement({parent: this.addForm, tag: "table"});
+    
+    this.makeHead();
+    this.makeBody(this.data);
+  }
+  
+
+  makeTopControls(tableDiv) {
+    let top = makeElement({parent: tableDiv, tag: "div", className: "top"});
+    
+    this.search = makeElement({
       parent: top, 
       tag: "input", 
       className: "search", 
@@ -64,64 +94,42 @@ class DTable {
     });
     this.search.placeholder = "Начните ввод для поиска... ";
     
-    let newBtn = this.makeElement({
+    let newBtn = makeElement({
       parent: top,
       tag: "button",
       text: "Добавить",
       className: "new-btn",
       event: "click",
-      func: () => this.newRecord()
+      func: () => this.showNewRecordForm()
     });
-    this.addForm = this.makeElement({parent: tableDiv, tag: "form"});
-    this.addForm.name = "add-form";
-    this.table = this.makeElement({parent: this.addForm, tag: "table"});
-    
-    this.makeHead();
-    this.makeBody(this.data);
   }
 
-  
-  makeElement({parent = null, tag, text = "", className = "", event = "", func = null}) {
-    let elm = document.createElement(tag);
-    elm.className = "dtb-" + tag;
-    if (text) elm.innerHTML = text;
-    if (className) elm.className = "dtb-" + className;
-    if (event && func) elm.addEventListener(event, func);
-    if (parent) parent.appendChild(elm);
-    return elm;
-  }
-  
-  
+
   makeHead() {
-
-    const thead = this.makeElement({parent: this.table, tag: "thead"});
-    const tr = this.makeElement({parent: thead, tag: "tr"});
+    const thead = makeElement({parent: this.table, tag: "thead"});
+    const tr = makeElement({parent: thead, tag: "tr"});
       
     for (let i = 0; i < this.columns.length; i++) {
-      let th = this.makeElement({parent: tr, tag: "th", text: this.columns[i].title});
+      let th = makeElement({parent: tr, tag: "th", text: this.columns[i].title});
       this.makeSortable(th, i);
     }
     
-    this.makeElement({parent: tr, tag: "th", text: "Действия"});
+    makeElement({parent: tr, tag: "th", text: "Действия"});
   }
   
    
   makeSortable(th, columnNum) {
-    let arrow = this.makeElement({parent: th, tag: "div", className: "arrow"});
+    let arrow = makeElement({parent: th, tag: "div", className: "arrow"});
     th.onclick = () => this.sortColumn(columnNum, arrow);
   }
   
   
-  makeAddRow(tbody) {
-    
-    //this.addForm = this.makeElement({parent: tbody, tag: "form"});
-    this.addRow = this.makeElement({parent: tbody, tag: "tr", className: "hidden"});
+  makeNewRecordForm(tbody) {
+    this.addRow = makeElement({parent: tbody, tag: "tr", className: "hidden"});
     
     for (let column of this.columns) {
-      //this.makeElement({parent: this.addRow, tag: "td"});
-      let elm = this.makeElement({
-        parent: this.makeElement({parent: this.addRow, tag: "td"}), 
-        //parent: this.addForm,  
+      let elm = makeElement({
+        parent: makeElement({parent: this.addRow, tag: "td"}), 
         tag: "input",
         className: "new-value",
       });
@@ -129,77 +137,45 @@ class DTable {
       elm.required = true;
     }
     
-    
-    this.makeElement({
-      parent: this.makeElement({parent: this.addRow, tag: "td"}),
-      //parent: this.addForm,
+    makeElement({
+      parent: makeElement({parent: this.addRow, tag: "td"}),
       tag: "input", 
-      //text: "Принять", 
       className: "hidden",
     }).type="submit";
     
     this.addForm.onsubmit = () => this.addRecord(event);
   }
   
-  addRecord(event) {
-    event.preventDefault();
-    //console.log(document.forms["add-form"]["surname"].value);
-    const form = document.forms["add-form"];
-    let rec = {};
-    console.log(this.columns);
-    for (let c of this.columns) {
-      rec[c.value] = form[c.value].value;
-      if (typeof(this.data[0][c.value]) == "number"){
-        rec[c.value] = +rec[c.value];
-      }
-    }
-    this.data.push(rec);
-    console.log(this.data);
-    this.reloadBody();
-  }
-  
+
   makeBody(data) {
-    
-    const tbody = this.makeElement({parent:this.table, tag:"tbody"});
-    this.makeAddRow(tbody);
+    const tbody = makeElement({parent:this.table, tag:"tbody"});
+    this.makeNewRecordForm(tbody);
     
     for (let item of data) {
-      this.makeRow(this.makeElement({parent:tbody, tag:"tr"}), item);
+      this.makeRow(makeElement({parent:tbody, tag:"tr"}), item);
     }
   }
   
   
   makeRow(tr, item) {
-    
     for (let column of this.columns) {
-      this.makeElement({parent: tr, tag: "td", text: item[column.value]});
+      makeElement({parent: tr, tag: "td", text: item[column.value]});
     }
     
-    this.makeElement({parent: this.makeElement({parent: tr, tag: "td"}),
-                     tag: "button", 
-                     text: "Удалить", 
-                     className: "del-btn",
-                     event: "click",
-                     func: () => this.delItem(item["id"])
-                    });
+    makeElement({parent: makeElement({parent: tr, tag: "td"}),
+                tag: "button", 
+                text: "Удалить", 
+                className: "del-btn",
+                event: "click",
+                func: () => this.delRecord(item["id"])
+              });
   }
   
   
-  newRecord() {
+  showNewRecordForm() {
     this.addRow.classList.toggle("dtb-hidden");
   }
-  
-  
-  delItem(id) {
-      for (let i = 0; i < this.data.length; i++) {
-      if (this.data[i].id == id) {
-        this.data.splice(i, 1);
-        break;
-      }
-    }
-    this.reloadBody();
-  }
-  
+    
   
   reloadBody(data = null) {
     this.table.removeChild(this.table.lastChild);
@@ -221,6 +197,7 @@ class DTable {
     this.reloadBody();
   }
   
+
   filterData(searchInput) {
     let findStr = this.search.value.toLowerCase();
 
@@ -238,31 +215,100 @@ class DTable {
     this.reloadBody(fdata);
   }
   
-  
+  createRecord() {
+    let rec = {};
+    for (let c of this.columns) {
+      rec[c.value] = this.addForm[c.value].value;
+      if (typeof(this.data[0][c.value]) == "number"){
+        rec[c.value] = +rec[c.value];
+      }
+    }
+    return rec;
+  }
+}
+
+
+class LocalDTable extends DTable {
+  constructor(config, data) {
+    super(config);
+    this.data = data;
+    this.lastId = data[data.length - 1].id;
+  }
+
+  delRecord(id) {
+    for (let i = 0; i < this.data.length; i++) {
+      if (this.data[i].id == id) {
+        this.data.splice(i, 1);
+        break;
+      }
+    }
+    this.reloadBody();
+  }
+
+  addRecord(event) {
+    event.preventDefault();
+    let rec = this.createRecord();
+    rec.id = ++this.lastId;
+    this.data.push(rec);
+    this.reloadBody();
+  }
+
   
 }
 
 
-/*
- //this.getData(config.apiUrl);
-  getData(url) {
-    fetch(url)
-    .then((response) => {
-        return response.json();
-    })
-    .then((data) => {
-        this.data = this.makeData(data.data);
-        this.makeBody();
-        console.log(this.data);
-    });
+class RemoteDTable extends DTable {
+  constructor(config) {
+    super(config);
+    this.apiUrl = config.apiUrl;
+  }
+
+  async make() {
+    this.data = await this.getData();
+    super.make();
+  }
+
+  async getData() {
+    const response = await fetch(this.apiUrl);
+    if(!response.ok) {
+      return;
+    }
+    const data = await response.json();
+    return this.transformData(data.data);
   }
   
-  makeData(rawData) {
+  transformData(rawData) {
     let res = [];
     for (let d in rawData) {
         res.push(rawData[d]);
     }
     return res;
   }
- */
+
+  async delRecord(id) {
+    const response = await fetch(this.apiUrl + "/" + id, {method: "DELETE"});
+    if (response.ok) {
+      this.data = await this.getData();   
+      this.reloadBody();
+    }
+  }
+
+  async addRecord(event) {
+    event.preventDefault();
+    let rec = this.createRecord();
+    const response = await fetch(this.apiUrl, {
+      method: 'POST',
+      body: JSON.stringify(rec),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    if (response.ok){
+      this.data = await this.getData(); 
+      this.reloadBody();
+    }
+  }
+  
+}
+
 

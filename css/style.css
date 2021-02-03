@@ -1,3 +1,15 @@
+:root {
+  --bg: #FAFFFA;
+  --bg-even: #DFEFDF;
+  --bg-hover: #AFBFAF;
+  --bg-head: #5A705F;
+  --bg-head-hover: #4A604F;
+  --arrow-unactive: lightgray;
+  --arrow-active: black;
+  --bg-del-btn: #AE402E;
+}
+
+
 *,
 *::before,
 *::after {
@@ -6,7 +18,8 @@
 
 .section {
   max-width: 1000px;
-  margin: 10px auto;
+  margin: 10px auto 30px;
+  background-color: var(--bg);
 }
 
 .dtb-table {
@@ -19,16 +32,16 @@
 }
 
 .dtb-thead {
-  background-color: #5A705F;
-  color: #DFEFDF;
+  background-color: var(--bg-head);
+  color: var(--bg-even);
 }
 
 .dtb-tr:nth-child(even) {
-  background-color: #DFEFDF;
+  background-color: var(--bg-even);
 }
 
 .dtb-tr:hover {
-  background-color: #AFBFAF;
+  background-color: var(--bg-hover);
 }
 
 .dtb-th {
@@ -39,7 +52,7 @@
 }
 
 .dtb-th:hover {
-  background-color: #4A604F;
+  background-color: var(--bg-head-hover);
 }
 
 .dtb-arrow {
@@ -48,18 +61,18 @@
   height: 0;
   position: absolute;
   right: 7px;
-  border-top: 6px solid lightgray; 
+  border-top: 6px solid var(--arrow-unactive); 
   bottom: 0;
 }
 
 .dtb-arrow-up {
-  border-bottom: 6px solid black;
+  border-bottom: 6px solid var(--arrow-active);
   border-top: 6px solid transparent; 
   top: 0;
 }
 
 .dtb-arrow-down {
-  border-top: 6px solid black;
+  border-top: 6px solid var(--arrow-active);
   bottom: 0;
 }
 
@@ -68,24 +81,20 @@
 }
 
 .dtb-del-btn, .dtb-add-btn, .dtb-new-btn {
-  background-color: #AE402E;
+  background-color: var(--bg-del-btn);
   padding: 5px 20px;
   font-family: "Arial", serif;
-  color: #DFEFDF;
+  color: var(--bg-even);
   font-weight: bold;
   outline: none;
-  border-color: #5A705F;
+  border-color: var(--bg-head);
   margin: 2px;
   border-radius: 5px;
 }
 
-.dtb-add-btn {
-  background-color: #40AE2E;
-}
-
 .dtb-new-btn {
   width: 200px;
-  background-color: #4A604F;
+  background-color: var(--bg-head-hover);
 }
 
 .dtb-top {
@@ -100,9 +109,9 @@
   padding: 5px 10px;
   margin: 5px;
   width: 300px;
-  border: 1px solid #4A604F;
+  border: 1px solid var(--bg-head-hover);
   border-radius: 7px;
-  color: #4A604F;
+  color: var(--bg-head-hover);
 }
 
 .dtb-hidden {
@@ -113,5 +122,5 @@
   padding: 5px 10px;
   margin: 5px;
   border-radius: 5px;
-  color: #4A604F;
+  color: var(--bg-head-hover);
 }
