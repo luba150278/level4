@@ -266,6 +266,7 @@ class RemoteDTable extends DTable {
   async make() {
     this.data = await this.getData();
     super.make();
+    console.log(this.data);
   }
 
   async getData() {
@@ -280,7 +281,8 @@ class RemoteDTable extends DTable {
   transformData(rawData) {
     let res = [];
     for (let d in rawData) {
-        res.push(rawData[d]);
+      if(!rawData[d].id) rawData[d].id = d;  
+      res.push(rawData[d]);
     }
     return res;
   }
