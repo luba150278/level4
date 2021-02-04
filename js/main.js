@@ -2,9 +2,9 @@ document.body.onload = function() {
   const config1 = {
     parent: '#usersTable',
     columns: [
-      {title: 'Имя', value: 'name'},
-      {title: 'Фамилия', value: 'surname'},
-      {title: 'Возраст', value: 'age'},
+      {title: 'Имя', value: 'name', sortable: true},
+      {title: 'Фамилия', value: 'surname', sortable: true},
+      {title: 'Возраст', value: 'age', sortable: true},
     ]
   };
 
@@ -21,10 +21,10 @@ document.body.onload = function() {
   const config2 = {
     parent: '#remoteTable',
     columns: [
-      {title: 'Имя', value: 'name'},
-      {title: 'Фамилия', value: 'surname'},
-      {title: 'Дата рождения', value: 'birthday'},
-      {title: 'Аватар', value: 'avatar'},
+      {title: 'Имя', value: 'name', type: 'text', sortable: true},
+      {title: 'Фамилия', value: 'surname', type: 'text', sortable: true},
+      {title: 'Дата рождения', value: 'birthday', type: 'date', sortable: true},
+      {title: 'Аватар', value: 'avatar', type: 'text', sortable: false},
     ],
     apiUrl: "https://mock-api.shpp.me/asadov/users"
   };
@@ -112,7 +112,7 @@ class DTable {
       
     for (let i = 0; i < this.columns.length; i++) {
       let th = makeElement({parent: tr, tag: "th", text: this.columns[i].title});
-      this.makeSortable(th, i);
+      if(this.columns[i].sortable) this.makeSortable(th, i);
       th.style.maxWidth = this.maxColWidth;
     }
     
@@ -137,6 +137,7 @@ class DTable {
         tag: "input",
         className: "new-value",
       });
+      elm.type=column.type;
       elm.name = column.value;
       elm.required = true;
       elm.style.width = "100%";
