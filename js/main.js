@@ -65,6 +65,7 @@ class DTable {
     this.parent = config.parent;
     this.columns = config.columns;
     this.data = null;
+    this.maxColWidth = ((100 / (this.columns.length + 1)) | 0) - 1 + "%";
   }
   
   
@@ -112,6 +113,7 @@ class DTable {
     for (let i = 0; i < this.columns.length; i++) {
       let th = makeElement({parent: tr, tag: "th", text: this.columns[i].title});
       this.makeSortable(th, i);
+      th.style.maxWidth = this.maxColWidth;
     }
     
     makeElement({parent: tr, tag: "th", text: "Действия"});
@@ -128,13 +130,16 @@ class DTable {
     this.addRow = makeElement({parent: tbody, tag: "tr", className: "hidden"});
     
     for (let column of this.columns) {
+      let parent = makeElement({parent: this.addRow, tag: "td"});
+      parent.style.maxWidth = this.maxColWidth;
       let elm = makeElement({
-        parent: makeElement({parent: this.addRow, tag: "td"}), 
+        parent: parent, 
         tag: "input",
         className: "new-value",
       });
       elm.name = column.value;
       elm.required = true;
+      elm.style.width = "100%";
     }
     
     makeElement({
@@ -159,7 +164,8 @@ class DTable {
   
   makeRow(tr, item) {
     for (let column of this.columns) {
-      makeElement({parent: tr, tag: "td", text: item[column.value]});
+      let elm = makeElement({parent: tr, tag: "td", text: item[column.value]});
+      elm.style.maxWidth = this.maxColWidth;
     }
     
     makeElement({parent: makeElement({parent: tr, tag: "td"}),
