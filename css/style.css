@@ -17,7 +17,7 @@
 }
 
 .section {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 10px auto 30px;
   background-color: var(--bg);
 }
@@ -25,6 +25,8 @@
 .dtb-table {
   width: 100%;
   border-collapse: collapse;
+  overflow: scroll;
+
 }
 
 .dtb-thead, .dtb-tbody {
@@ -78,6 +80,8 @@
 
 .dtb-td {
   padding: 5px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dtb-del-btn, .dtb-add-btn, .dtb-new-btn {
